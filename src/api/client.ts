@@ -2,10 +2,20 @@ import type { PageDto, SpendingSummaryDto, TransactionDto, WalletDto } from './t
 
 const BASE = '/api/v1'
 
+export class ApiError extends Error {
+  status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(path)
   if (!res.ok) {
-    throw new Error(`GET ${path} failed with status ${res.status}`)
+    throw new ApiError(res.status, `GET ${path} failed with status ${res.status}`)
   }
   return (await res.json()) as T
 }

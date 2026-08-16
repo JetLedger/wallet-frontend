@@ -24,6 +24,13 @@ feed, D3 donut, empty state) wired to wallet-core over REST + SSE.
 7. Build + unit tests via Makefile; run E2E against seeded local stack.
 
 ## Validation
-`npm run build` and `npm test` green; Playwright E2E passes against a running
-wallet-core. Start the backend locally with the `dev` profile (kafka/redis disabled):
-`./gradlew bootRun --args='--spring.profiles.active=dev'`.
+Canonical commands are the root Makefile targets (`make build-all`, `make test-regression`,
+`make test-e2e`); the root Makefile does not yet define targets for this module, so the
+direct equivalents are used until then:
+
+- Build/typecheck: `npm run build`
+- Unit tests: `npm test`
+- E2E: `npm run test:e2e` — `scripts/run-e2e.sh` starts wallet-core with the `dev`
+  profile (kafka/redis disabled) when it is not already running, waits for readiness,
+  then runs Playwright. Override the backend location with `WALLET_CORE_DIR` (default
+  `../wallet-core`).

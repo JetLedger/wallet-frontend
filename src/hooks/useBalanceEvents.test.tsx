@@ -55,6 +55,12 @@ function makeClient(): QueryClient {
   return queryClient
 }
 
+function makeEmptyClient(): QueryClient {
+  return new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+}
+
 describe('useBalanceEvents', () => {
   beforeEach(() => {
     MockEventSource.instances = []
@@ -110,5 +116,55 @@ describe('useBalanceEvents', () => {
     )
     renderHook(() => useBalanceEvents(''), { wrapper })
     expect(MockEventSource.instances).toHaveLength(0)
+  })
+
+  it('creates a cache entry from the event when no wallet is cached yet', () => {
+    const queryClient = makeEmptyClient()
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+
+    const { unmount } = renderHook(() => useBalanceEvents(WALLET_ID), { wrapper })
+
+    act(() => {
+      MockEventSource.instances[0].emit('balance', {
+        walletId: WALLET_ID,
+        balance: 150,
+        currency: 'USD',
+        updatedAt: '2026-08-15T11:00:00Z',
+      })
+    })
+
+    const cached = queryClient.getQueryData<WalletDto>(['wallet', WALLET_ID])
+    expect(cached?.walletId).toBe(WALLET_ID)
+    expect(cached?.balance).toBe(150)
+    expect(cached?.currency).toBe('USD')
+    expect(cached?.updatedAt).toBe('2026-08-15T11:00:00Z')
+
+    unmount()
+  })
+
+  it('ignores a stale balance event older than the cached balance', () => {
+    const queryClient = makeClient()
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+
+    const { unmount } = renderHook(() => useBalanceEvents(WALLET_ID), { wrapper })
+
+    act(() => {
+      MockEventSource.instances[0].emit('balance', {
+        walletId: WALLET_ID,
+        balance: 90,
+        currency: 'USD',
+        updatedAt: '2026-08-15T09:00:00Z',
+      })
+    })
+
+    const cached = queryClient.getQueryData<WalletDto>(['wallet', WALLET_ID])
+    expect(cached?.balance).toBe(100)
+    expect(cached?.updatedAt).toBe('2026-08-15T10:00:00Z')
+
+    unmount()
   })
 })

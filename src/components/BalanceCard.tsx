@@ -14,13 +14,31 @@ export function formatTimestamp(iso: string): string {
 interface Props {
   wallet: WalletDto | undefined
   loading: boolean
+  error?: boolean
+  notFound?: boolean
 }
 
-export function BalanceCard({ wallet, loading }: Props) {
+export function BalanceCard({ wallet, loading, error, notFound }: Props) {
   if (loading) {
     return (
       <section className="balance-card balance-card--loading" aria-label="Balance">
         <p className="balance-card__hint">Loading balance…</p>
+      </section>
+    )
+  }
+
+  if (notFound) {
+    return (
+      <section className="balance-card balance-card--missing" aria-label="Balance">
+        <p className="balance-card__hint">Wallet not found.</p>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section className="balance-card balance-card--error" aria-label="Balance">
+        <p className="balance-card__hint">Unable to load balance.</p>
       </section>
     )
   }

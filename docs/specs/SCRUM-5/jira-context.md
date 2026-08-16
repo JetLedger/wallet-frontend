@@ -10,7 +10,7 @@ Build wallet dashboard with balance display, transaction history, and category b
 - Balance card: amount, currency, last updated timestamp
 - Transaction list: amount, merchant, category badge (color-coded), timestamp — paginated (20/page)
 - D3.js donut chart: spending by category for current month, hover shows amount + %
-- SSE endpoint {{GET /api/v1/wallets/{id}/events}} streams balance updates to frontend
+- SSE endpoint `GET /api/v1/wallets/{id}/events` streams balance updates to frontend
 - Balance updates without page reload on deposit/withdraw
 - Playwright E2E: load dashboard → see balance → see transactions → chart renders
 - Empty state shown when no transactions exist

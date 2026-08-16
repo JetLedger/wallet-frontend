@@ -6,6 +6,7 @@ import { useBalanceEvents } from './hooks/useBalanceEvents'
 import { BalanceCard } from './components/BalanceCard'
 import { TransactionList } from './components/TransactionList'
 import { SpendingDonut } from './components/SpendingDonut'
+import { ApiError } from './api/client'
 import './app.css'
 
 export function App() {
@@ -26,13 +27,15 @@ export function App() {
     }
   }
 
-  const walletMissing = walletId.length > 0 && wallet.isError
+  const walletNotFound =
+    wallet.isError && wallet.error instanceof ApiError && wallet.error.status === 404
+  const walletLoadFailed = wallet.isError && !walletNotFound
 
   return (
     <main className="app">
       <header className="app__header">
         <h1 className="app__title">Wallet Dashboard</h1>
-        {walletId.length === 0 && (
+        {(walletId.length === 0 || wallet.isError) && (
           <form className="app__wallet-form" onSubmit={handleSubmit}>
             <label htmlFor="wallet-id">Wallet ID</label>
             <input
@@ -46,10 +49,18 @@ export function App() {
         )}
       </header>
 
-      <BalanceCard wallet={wallet.data} loading={wallet.isPending} />
+      <BalanceCard
+        wallet={wallet.data}
+        loading={wallet.isPending}
+        error={walletLoadFailed}
+        notFound={walletNotFound}
+      />
 
-      {walletMissing && (
+      {walletNotFound && (
         <p className="app__error">Wallet not found. Check the wallet id.</p>
+      )}
+      {walletLoadFailed && (
+        <p className="app__error">Unable to load the wallet. Please try again.</p>
       )}
 
       {wallet.data && (

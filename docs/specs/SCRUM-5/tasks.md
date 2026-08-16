@@ -14,6 +14,10 @@
 5. **Unit tests** (Vitest + Testing Library): BalanceCard, CategoryBadge, TransactionList
    (pagination), SpendingDonut (data→arcs), EmptyState, useBalanceEvents (event →
    invalidation).
-6. **E2E**: `playwright.config.ts`, `e2e/dashboard.spec.ts` (seed wallet via API →
-   load dashboard → balance visible → transactions visible → donut rendered).
-7. **Validation**: `make build-all` (build) + `make test-regression` (unit) + Playwright.
+6. **E2E**: `playwright.config.ts`, `scripts/run-e2e.sh` (starts wallet-core `dev`
+   profile when needed), `e2e/dashboard.spec.ts` (seed wallet via API → load dashboard
+   → balance visible → transactions visible → donut rendered).
+7. **Validation**: `make build-all` (build) + `make test-regression` (unit) + Playwright
+   (`npm run test:e2e`); root Makefile does not yet define these targets — documented
+   exception in plan.md.
+8. **Spec artifacts** (constitution): `tests.md`, `implementation.md`, `pr.md`.
