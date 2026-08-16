@@ -1,20 +1,27 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { fetchWallet } from '../api/client'
-import type { WalletDto } from '../api/types'
+import type { PartialBalance, WalletDto } from '../api/types'
 import { isNewer } from '../lib/time'
 
 export function useWallet(walletId: string) {
-  const queryClient = useQueryClient()
-  return useQuery({
+  const wallet = useQuery({
     queryKey: ['wallet', walletId],
-    queryFn: async () => {
-      const fresh = await fetchWallet(walletId)
-      const cached = queryClient.getQueryData<WalletDto>(['wallet', walletId])
-      if (cached && isNewer(cached.updatedAt, fresh.updatedAt)) {
-        return cached
-      }
-      return fresh
-    },
+    queryFn: () => fetchWallet(walletId),
     enabled: walletId.length > 0,
   })
+
+  const balance = useQuery<PartialBalance | undefined>({
+    queryKey: ['balance', walletId],
+    queryFn: () => undefined,
+    enabled: false,
+    staleTime: Infinity,
+    retry: false,
+  })
+
+  let data: WalletDto | undefined = wallet.data
+  if (data && balance.data && isNewer(balance.data.updatedAt, data.updatedAt)) {
+    data = { ...data, balance: balance.data.balance, updatedAt: balance.data.updatedAt }
+  }
+
+  return { ...wallet, data }
 }

@@ -16,5 +16,6 @@
   feed/summary; cache entry created when none exists; stale (older) events ignored.
 - `src/hooks/useWallet.test.tsx` — keeps the newer SSE balance over an older REST
   response, and vice versa (timestamp ordering regression tests).
-- `e2e/dashboard.spec.ts` — E2E: create + fund wallet via API → load dashboard →
-  balance visible → transactions visible → donut rendered.
+- `e2e/dashboard.spec.ts` — E2E: (1) create + fund a wallet via API → load dashboard →
+  balance visible → transactions visible → donut rendered; (2) brand-new wallet →
+  both empty states (empty transaction feed + empty donut) rendered.

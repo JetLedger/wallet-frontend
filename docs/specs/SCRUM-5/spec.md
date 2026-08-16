@@ -48,7 +48,7 @@ src/
 │   ├── useWallet.ts            # balance card data
 │   ├── useTransactions.ts      # paginated feed (page state)
 │   ├── useSpendingSummary.ts   # donut data for current month
-│   └── useBalanceEvents.ts     # EventSource subscription → invalidate queries + optimistic balance
+│   └── useBalanceEvents.ts     # EventSource subscription → newest-wins partial-balance cache + invalidation
 └── components/
     ├── BalanceCard.tsx
     ├── TransactionList.tsx
@@ -63,8 +63,10 @@ src/
 - `useWallet` / `useTransactions` / `useSpendingSummary` use TanStack Query against the
   wallet-core REST API (page size 20).
 - `useBalanceEvents` opens `EventSource(/api/v1/wallets/{id}/events)`. On a `balance`
-  event it sets the balance card optimistically (same shape as the wallet response) and
-  invalidates the transactions + summary queries so feed/chart refresh without reload.
+  event it records the new balance under a separate partial-balance cache key
+  (newest-wins by timestamp, no fabricated wallet fields) and invalidates the
+  transactions + summary queries so feed/chart refresh without reload; `useWallet`
+  merges the newest balance into the card data.
 - Category → color mapping is a fixed palette in `CategoryBadge` (e.g. FOOD=orange,
   TRANSPORT=blue, ... UNCATEGORIZED=gray).
 

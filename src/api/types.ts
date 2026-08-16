@@ -44,3 +44,9 @@ export interface BalanceEvent {
   currency: string
   updatedAt: string
 }
+
+export interface PartialBalance {
+  balance: number
+  currency: string
+  updatedAt: string
+}

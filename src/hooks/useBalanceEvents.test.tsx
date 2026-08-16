@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, act } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { useBalanceEvents } from './useBalanceEvents'
-import type { WalletDto } from '../api/types'
+import type { PartialBalance, WalletDto } from '../api/types'
 
 const WALLET_ID = 'wallet-1'
 
@@ -71,7 +71,7 @@ describe('useBalanceEvents', () => {
     vi.unstubAllGlobals()
   })
 
-  it('updates the cached balance and invalidates feed queries on a balance event', async () => {
+  it('updates the partial balance and invalidates feed queries on a balance event', async () => {
     const queryClient = makeClient()
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
 
@@ -95,7 +95,7 @@ describe('useBalanceEvents', () => {
       })
     })
 
-    const cached = queryClient.getQueryData<WalletDto>(['wallet', WALLET_ID])
+    const cached = queryClient.getQueryData<PartialBalance>(['balance', WALLET_ID])
     expect(cached?.balance).toBe(150)
     expect(cached?.updatedAt).toBe('2026-08-15T11:00:00Z')
     expect(invalidate).toHaveBeenCalledWith(
@@ -118,7 +118,7 @@ describe('useBalanceEvents', () => {
     expect(MockEventSource.instances).toHaveLength(0)
   })
 
-  it('creates a cache entry from the event when no wallet is cached yet', () => {
+  it('keeps partial balance state separate without fabricating WalletDto fields', () => {
     const queryClient = makeEmptyClient()
     const wrapper = ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -135,17 +135,25 @@ describe('useBalanceEvents', () => {
       })
     })
 
-    const cached = queryClient.getQueryData<WalletDto>(['wallet', WALLET_ID])
-    expect(cached?.walletId).toBe(WALLET_ID)
-    expect(cached?.balance).toBe(150)
-    expect(cached?.currency).toBe('USD')
-    expect(cached?.updatedAt).toBe('2026-08-15T11:00:00Z')
+    const balance = queryClient.getQueryData<PartialBalance>(['balance', WALLET_ID])
+    expect(balance?.balance).toBe(150)
+    expect(balance?.currency).toBe('USD')
+    expect(balance?.updatedAt).toBe('2026-08-15T11:00:00Z')
+    expect('createdAt' in (balance ?? {})).toBe(false)
+
+    const wallet = queryClient.getQueryData<WalletDto>(['wallet', WALLET_ID])
+    expect(wallet).toBeUndefined()
 
     unmount()
   })
 
-  it('ignores a stale balance event older than the cached balance', () => {
-    const queryClient = makeClient()
+  it('ignores a stale balance event older than the partial balance', () => {
+    const queryClient = makeEmptyClient()
+    queryClient.setQueryData<PartialBalance>(['balance', WALLET_ID], {
+      balance: 100,
+      currency: 'USD',
+      updatedAt: '2026-08-15T10:00:00Z',
+    })
     const wrapper = ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
@@ -161,9 +169,9 @@ describe('useBalanceEvents', () => {
       })
     })
 
-    const cached = queryClient.getQueryData<WalletDto>(['wallet', WALLET_ID])
-    expect(cached?.balance).toBe(100)
-    expect(cached?.updatedAt).toBe('2026-08-15T10:00:00Z')
+    const balance = queryClient.getQueryData<PartialBalance>(['balance', WALLET_ID])
+    expect(balance?.balance).toBe(100)
+    expect(balance?.updatedAt).toBe('2026-08-15T10:00:00Z')
 
     unmount()
   })
