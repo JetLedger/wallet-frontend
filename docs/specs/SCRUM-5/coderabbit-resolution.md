@@ -7,8 +7,8 @@ Review: https://github.com/JetLedger/wallet-frontend/pull/1 (CodeRabbit `coderab
 | # | Finding | Verdict | Resolution |
 |---|---------|---------|------------|
 | 3787513602 | PreToolUse bash hook: `echo $CLAUDE_TOOL_INPUT` unquoted + parse error aborts silently | VALID | Quoted `${CLAUDE_TOOL_INPUT:-}`; fail-closed when parsing or reading input fails. |
-| 3787513606 | Write/Edit hook same parsing issues | VALID | Same fail-closed quoting applied to both Write/Edit hooks. |
-| 3787513612 | Branch guard treats detached HEAD / git failure as safe, and secret regex too narrow | VALID | Detached HEAD or git failure now blocks with remediation message; secret scan is case-insensitive and covers `aws_secret_access_key`, `github_token`, `api_key`, `secret_key`, `private_key`, `access_token`, `client_secret`, `jwt_secret` for `=`/`:` assignments. |
+| 3787513606 | Branch guard treats detached HEAD / git failure as safe | VALID | Hook validates `git rev-parse --is-inside-work-tree` before reading the branch name, blocks detached HEAD / git failure, and blocks `main`/`master`. |
+| 3787513612 | Hardcoded-secret detector too narrow | VALID | Case-insensitive scan covers `password`/`passwd`/`pwd`/`token` plus the prior credential names, accepts both `'` and `"` quoted values, for `=`/`:` assignments. |
 | 3787513616 | `.gitignore` does not ignore `.env` | VALID | Added `.env`, `.env.*`, kept `!.env.example`. |
 | 3787513630 | jira-context uses `{{GET …}}` ADF-ism in markdown | VALID | Replaced with inline code `` `GET /api/v1/wallets/{id}/events` ``. |
 | 3787513639 | plan.md references undefined `make` targets | VALID | plan.md cites canonical Makefile targets and documents the exception (no root Makefile yet) with direct npm equivalents. |
@@ -37,3 +37,10 @@ Review: https://github.com/JetLedger/wallet-frontend/pull/1 (CodeRabbit `coderab
 | 3808076644 | markdownlint MD058: missing blank line between the iteration-1 table and the `Review Iteration 2` heading | VALID | Blank line added before the heading. |
 | 3808076654 | resolution doc records the cache key as `['balance']` instead of the full `['balance', walletId]` | VALID | Iteration-2 entry above now records the complete wallet-scoped key. |
 | 3808076660 | `useWallet` newer-balance merge drops `currency` from the SSE `PartialBalance` | VALID | Merge now copies `balance.data.currency` alongside `balance` and `updatedAt`; test added for differing REST/SSE currencies. |
+
+## Review Iteration 4 (2026-08-19, follow-up closure on `.claude/settings.json`)
+
+| # | Finding | Verdict | Resolution |
+|---|---------|---------|------------|
+| 3787513606 (follow-up) | CodeRabbit requested an explicit `git rev-parse --is-inside-work-tree` check before reading the branch name | VALID | Check added as the first step of the branch guard; verified locally (feature branch allowed, non-work-tree and `main`/`master` blocked). |
+| 3787513612 (follow-up) | Secret detector misses `password`/`token` names and single-quoted values | VALID | Regex broadened with `password`/`passwd`/`pwd`/`token`; accepts both `'` and `"` quoted values; verified locally (credentials caught, clean files ignored). |
