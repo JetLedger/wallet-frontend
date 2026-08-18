@@ -15,8 +15,9 @@
 - `useWallet` — `useQuery(['wallet', id])` plus a disabled observer of the
   `['balance', id]` partial-balance cache. The returned `WalletDto` merges the newest
   balance by timestamp in render: when the SSE-fed partial balance is newer than the
-  REST snapshot, its balance/`updatedAt` win; `createdAt` always comes from the REST
-  response (never fabricated). An in-flight fetch cannot overwrite a newer live balance.
+  REST snapshot, its balance, currency, and `updatedAt` win; `createdAt` always comes
+  from the REST response (never fabricated). An in-flight fetch cannot overwrite a
+  newer live balance.
 - `useTransactions` — page state, page size 20.
 - `useSpendingSummary` — current month.
 - `useBalanceEvents` — `EventSource` on `GET /api/v1/wallets/{id}/events`; a `balance`

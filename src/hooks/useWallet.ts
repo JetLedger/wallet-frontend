@@ -20,7 +20,12 @@ export function useWallet(walletId: string) {
 
   let data: WalletDto | undefined = wallet.data
   if (data && balance.data && isNewer(balance.data.updatedAt, data.updatedAt)) {
-    data = { ...data, balance: balance.data.balance, updatedAt: balance.data.updatedAt }
+    data = {
+      ...data,
+      balance: balance.data.balance,
+      currency: balance.data.currency,
+      updatedAt: balance.data.updatedAt,
+    }
   }
 
   return { ...wallet, data }
