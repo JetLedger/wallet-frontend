@@ -1,0 +1,308 @@
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.app__title {
+  font-size: 24px;
+  margin: 0;
+}
+
+.app__wallet-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.app__wallet-form label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.app__wallet-form input {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  min-width: 0;
+  flex: 1 1 280px;
+}
+
+.app__wallet-form button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: #fff;
+}
+
+.app__error {
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.app__grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.app__section-title {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+
+@media (max-width: 720px) {
+  .app__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.balance-card {
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.balance-card__amount {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.balance-card__currency {
+  margin-top: 4px;
+  font-size: 14px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.balance-card__updated {
+  margin-top: 12px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.balance-card__hint {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.transaction-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.transaction-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.transaction-row:last-child {
+  border-bottom: none;
+}
+
+.transaction-row__merchant {
+  flex: 1;
+  font-weight: 600;
+}
+
+.transaction-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.transaction-row__time {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.transaction-row__amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.transaction-row__amount--positive {
+  color: #059669;
+}
+
+.transaction-row__amount--negative {
+  color: #dc2626;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.transaction-list__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.transaction-list__pagination button {
+  padding: 6px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.transaction-list__pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state__icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: #e5e7eb;
+}
+
+.empty-state__title {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.empty-state__copy {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.spending-donut {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.spending-donut__title {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.spending-donut__chart {
+  position: relative;
+  text-align: center;
+}
+
+.spending-donut__tooltip {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.spending-donut__tooltip-category {
+  font-weight: 600;
+}
+
+.spending-donut__tooltip-pct {
+  opacity: 0.85;
+}
+
+.spending-donut__legend {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.spending-donut__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spending-donut__legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+}
+
+.spending-donut__legend-name {
+  font-weight: 600;
+}
+
+.spending-donut__legend-value {
+  margin-left: auto;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-donut__empty {
+  text-align: center;
+  padding: 16px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.spending-donut__ring {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  border: 16px solid #e5e7eb;
+}
+
+.spending-donut__hint {
+  margin: 0;
+}

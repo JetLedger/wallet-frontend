@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(printf '%s' \"${CLAUDE_TOOL_INPUT:-}\" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get(\"command\",\"\"))') || { echo 'BLOCKED: Failed to parse tool input.' >&2; exit 1; }; if [ -z \"$input\" ]; then echo 'BLOCKED: Failed to read tool input.' >&2; exit 1; fi; if printf '%s' \"$input\" | grep -qE 'push.+main|push.+master'; then echo 'BLOCKED: Direct push to main/master is not allowed. Use a feature branch.' >&2; exit 1; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(printf '%s' \"${CLAUDE_TOOL_INPUT:-}\" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get(\"path\",d.get(\"file_path\",\"\")))') || { echo 'BLOCKED: Failed to parse tool input.' >&2; exit 1; }; if [ -z \"$file\" ]; then echo 'BLOCKED: Failed to read tool input.' >&2; exit 1; fi; if printf '%s' \"$file\" | grep -qE '\\.env$|\\.env\\.'; then echo 'BLOCKED: Writing to .env files is not allowed. Use environment variables or secrets manager.' >&2; exit 1; fi"
+          },
+          {
+            "type": "command",
+            "command": "if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then echo 'BLOCKED: Not inside a git work tree. Create and switch to a feature branch first: git checkout -b feature/SCRUM-{id}-{slug}' >&2; exit 1; fi; branch=$(git branch --show-current 2>/dev/null) || branch=''; if [ -z \"$branch\" ]; then echo 'BLOCKED: Detached HEAD or git unavailable. Create and switch to a feature branch first: git checkout -b feature/SCRUM-{id}-{slug}' >&2; exit 1; fi; if [ \"$branch\" = \"main\" ] || [ \"$branch\" = \"master\" ]; then echo \"BLOCKED: You are on '$branch'. Create and switch to a feature branch first: git checkout -b feature/SCRUM-{id}-{slug}\" >&2; exit 1; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(printf '%s' \"${CLAUDE_TOOL_INPUT:-}\" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get(\"path\",d.get(\"file_path\",\"\")))') || exit 0; if [ -z \"$file\" ]; then exit 0; fi; if [ -f \"$file\" ] && grep -qEi '(password|passwd|pwd|token|secret|api[_-]?key|secret[_-]?key|secret[_-]?access[_-]?key|private[_-]?key|access[_-]?token|client[_-]?secret|jwt[_-]?secret|aws[_-]?secret[_-]?access[_-]?key|github[_-]?token)[[:space:]]*[:=][[:space:]]*[\"'\\'']?[A-Za-z0-9_@$%^&*#!./-]+' \"$file\" 2>/dev/null; then echo \"WARNING: Possible hardcoded credential detected in $file. Review before committing.\" >&2; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
